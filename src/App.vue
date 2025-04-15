@@ -5,6 +5,7 @@
 
       <!-- FORMULAIRE -->
       <form @submit.prevent="submitForm" class="bg-gray-800 p-6 rounded-lg shadow-md space-y-6">
+        <!-- INPUTS -->
         <div>
           <label class="block font-medium mb-1">Fichier fournisseur (.csv ou .xlsx)</label>
           <input type="file" @change="onFournisseurUpload" class="w-full bg-gray-700 p-2 rounded" />
@@ -13,7 +14,6 @@
           <label class="block font-medium mb-1">Fichier Keepa (.zip ou .rar)</label>
           <input type="file" @change="onKeepaUpload" class="w-full bg-gray-700 p-2 rounded" />
         </div>
-
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block font-medium mb-1">Taux de TVA (%)</label>
@@ -30,7 +30,6 @@
             <label>Prix fournisseur en HT</label>
           </div>
         </div>
-
         <div class="grid grid-cols-3 gap-4">
           <div>
             <label class="block font-medium mb-1">Marge minimale (€)</label>
@@ -54,14 +53,22 @@
             Exporter CSV
           </button>
         </div>
+
+        <!-- LOADER -->
+        <div v-if="loading" class="flex justify-center mt-6">
+          <div class="loader"></div>
+        </div>
       </form>
 
       <!-- TABLEAU -->
-      <div v-if="results.length" class="mt-10">
+      <div v-if="results.length && !loading" class="mt-10">
         <h2 class="text-xl font-semibold mb-4">Résultats</h2>
 
         <div v-for="(group, asin) in groupedByASIN" :key="asin" class="mb-6 border border-gray-700 rounded overflow-hidden">
-          <div class="bg-gray-700 px-4 py-2 cursor-pointer flex justify-between items-center" @click="toggleGroup(asin)">
+          <div
+            class="bg-gray-700 px-4 py-2 cursor-pointer flex justify-between items-center"
+            @click="toggleGroup(asin)"
+          >
             <span class="font-semibold">ASIN : {{ asin }}</span>
             <span>{{ collapsedGroups[asin] ? '▶' : '▼' }}</span>
           </div>
@@ -107,14 +114,6 @@
             <button @click="zoomedASIN = null" class="text-red-400 hover:underline">Fermer</button>
           </div>
           <img :src="`https://graph.keepa.com/pricehistory.png?asin=${zoomedASIN}&domain=fr&salesrank=1&range=365`" class="w-full max-h-[80vh] object-contain" />
-        </div>
-      </div>
-
-      <!-- LOADER -->
-      <div v-if="loading" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
-        <div class="text-center">
-          <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 mb-4 mx-auto animate-spin"></div>
-          <p class="text-white font-semibold">Analyse en cours... Veuillez patienter</p>
         </div>
       </div>
     </div>
@@ -228,7 +227,19 @@ body {
 }
 
 .loader {
-  border-top-color: #4ade80;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid #4ade80;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
   animation: spin 1s linear infinite;
 }
 </style>
+---
+
+Tu peux maintenant **commit & push** comme d’habitude :
+
+```bash
+git add src/App.vue
+git commit -m "✨ Animation du loader ajoutée"
+git push
