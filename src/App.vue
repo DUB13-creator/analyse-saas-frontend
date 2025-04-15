@@ -181,7 +181,7 @@ export default {
       formData.append('ventes_min', this.form.ventes_min);
 
       try {
-        const res = await fetch('http://127.0.0.1:8000/analyse', {
+        const res = await fetch('https://analyse-saas-backend.onrender.com/analyse', {
           method: 'POST',
           body: formData,
         });
