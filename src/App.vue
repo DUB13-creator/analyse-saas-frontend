@@ -53,12 +53,13 @@
             Exporter CSV
           </button>
         </div>
-
-        <!-- LOADER -->
-        <div v-if="loading" class="flex justify-center mt-6">
-          <div class="loader"></div>
-        </div>
       </form>
+
+      <!-- OVERLAY & LOADER -->
+      <div v-if="loading" class="fixed inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center z-50">
+        <div class="loader mb-4"></div>
+        <p class="text-white text-lg font-semibold">Analyse en cours…</p>
+      </div>
 
       <!-- TABLEAU -->
       <div v-if="results.length && !loading" class="mt-10">
@@ -220,12 +221,10 @@ export default {
 body {
   margin: 0;
 }
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
 .loader {
   border: 4px solid rgba(255, 255, 255, 0.2);
   border-top: 4px solid #4ade80;
@@ -235,11 +234,4 @@ body {
   animation: spin 1s linear infinite;
 }
 </style>
----
 
-Tu peux maintenant **commit & push** comme d’habitude :
-
-```bash
-git add src/App.vue
-git commit -m "✨ Animation du loader ajoutée"
-git push
