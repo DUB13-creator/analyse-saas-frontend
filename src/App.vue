@@ -5,7 +5,6 @@
 
       <!-- FORMULAIRE -->
       <form @submit.prevent="submitForm" class="bg-gray-800 p-6 rounded-lg shadow-md space-y-6">
-        <!-- INPUTS -->
         <div>
           <label class="block font-medium mb-1">Fichier fournisseur (.csv ou .xlsx)</label>
           <input type="file" @change="onFournisseurUpload" class="w-full bg-gray-700 p-2 rounded" />
@@ -14,6 +13,7 @@
           <label class="block font-medium mb-1">Fichier Keepa (.zip ou .rar)</label>
           <input type="file" @change="onKeepaUpload" class="w-full bg-gray-700 p-2 rounded" />
         </div>
+
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block font-medium mb-1">Taux de TVA (%)</label>
@@ -30,6 +30,7 @@
             <label>Prix fournisseur en HT</label>
           </div>
         </div>
+
         <div class="grid grid-cols-3 gap-4">
           <div>
             <label class="block font-medium mb-1">Marge minimale (€)</label>
@@ -60,10 +61,7 @@
         <h2 class="text-xl font-semibold mb-4">Résultats</h2>
 
         <div v-for="(group, asin) in groupedByASIN" :key="asin" class="mb-6 border border-gray-700 rounded overflow-hidden">
-          <div
-            class="bg-gray-700 px-4 py-2 cursor-pointer flex justify-between items-center"
-            @click="toggleGroup(asin)"
-          >
+          <div class="bg-gray-700 px-4 py-2 cursor-pointer flex justify-between items-center" @click="toggleGroup(asin)">
             <span class="font-semibold">ASIN : {{ asin }}</span>
             <span>{{ collapsedGroups[asin] ? '▶' : '▼' }}</span>
           </div>
@@ -111,6 +109,14 @@
           <img :src="`https://graph.keepa.com/pricehistory.png?asin=${zoomedASIN}&domain=fr&salesrank=1&range=365`" class="w-full max-h-[80vh] object-contain" />
         </div>
       </div>
+
+      <!-- LOADER -->
+      <div v-if="loading" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
+        <div class="text-center">
+          <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 mb-4 mx-auto animate-spin"></div>
+          <p class="text-white font-semibold">Analyse en cours... Veuillez patienter</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -131,6 +137,7 @@ export default {
       results: [],
       collapsedGroups: {},
       zoomedASIN: null,
+      loading: false,
     };
   },
   computed: {
@@ -163,6 +170,7 @@ export default {
       this.zoomedASIN = asin;
     },
     async submitForm() {
+      this.loading = true;
       const formData = new FormData();
       formData.append('fournisseur', this.fournisseurFile);
       formData.append('keepa_zip', this.keepaFile);
@@ -173,7 +181,7 @@ export default {
       formData.append('ventes_min', this.form.ventes_min);
 
       try {
-        const res = await fetch('https://analyse-saas-backend.onrender.com/analyse', {
+        const res = await fetch('http://127.0.0.1:8000/analyse', {
           method: 'POST',
           body: formData,
         });
@@ -185,6 +193,8 @@ export default {
         }));
       } catch (err) {
         alert('Erreur lors de l’analyse : ' + err.message);
+      } finally {
+        this.loading = false;
       }
     },
     exportCSV() {
@@ -210,5 +220,15 @@ export default {
 <style>
 body {
   margin: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loader {
+  border-top-color: #4ade80;
+  animation: spin 1s linear infinite;
 }
 </style>
